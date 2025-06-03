@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   title: "EventPass - Découvrez des événements extraordinaires",
   description:
     "EventPass vous connecte aux meilleurs événements près de chez vous. Achetez vos billets en toute sécurité et vivez des expériences inoubliables.",
-  generator: 'v0.dev'
 }
 
 export default function RootLayout({
