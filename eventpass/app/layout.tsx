@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "EventPass - Découvrez des événements extraordinaires",
   description:
     "EventPass vous connecte aux meilleurs événements près de chez vous. Achetez vos billets en toute sécurité et vivez des expériences inoubliables.",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className="dark">
+    <html lang="fr" className="dark" suppressHydrationWarning>
       <body className={`${inter.className} dark`}>{children}</body>
     </html>
   )

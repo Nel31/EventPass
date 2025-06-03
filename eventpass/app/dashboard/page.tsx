@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { SiteHeader } from "@/components/site-header"
+import { ResponsiveContainer } from "@/components/responsive-container"
 import Link from "next/link"
 
 const userTickets = [
@@ -65,43 +67,9 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rich-black via-chocolate-cosmos to-rosewood relative">
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-md bg-white/5 border-b border-white/10">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <img src="/logo-main.png" alt="EventPass" className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-              <span className="text-2xl font-bold text-selective-yellow">EventPass</span>
-            </Link>
+      <SiteHeader currentPath="/dashboard" isLoggedIn={true} userName="John Doe" userInitials="JD" />
 
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-white hover:text-princeton-orange transition-colors">
-                Accueil
-              </Link>
-              <Link href="/events" className="text-white hover:text-princeton-orange transition-colors">
-                Événements
-              </Link>
-              <Link href="/create-event" className="text-white hover:text-princeton-orange transition-colors">
-                Créer un événement
-              </Link>
-              <Link href="/dashboard" className="text-princeton-orange font-semibold">
-                Tableau de bord
-              </Link>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback className="bg-princeton-orange text-rich-black">JD</AvatarFallback>
-              </Avatar>
-              <Button variant="ghost" className="text-white hover:text-princeton-orange hover:bg-white/10">
-                Déconnexion
-              </Button>
-            </div>
-          </nav>
-        </div>
-      </header>
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <ResponsiveContainer className="py-8">
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-selective-yellow mb-2">Bonjour, John Doe !</h1>
@@ -359,7 +327,7 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </ResponsiveContainer>
     </div>
   )
 }

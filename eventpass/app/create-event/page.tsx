@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { SiteHeader } from "@/components/site-header"
+import { ResponsiveContainer } from "@/components/responsive-container"
 import Link from "next/link"
 
 const categories = [
@@ -32,42 +34,9 @@ export default function CreateEventPage() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-md bg-white/5 border-b border-white/10">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <img src="/logo-main.png" alt="EventPass" className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-              <span className="text-2xl font-bold text-selective-yellow">EventPass</span>
-            </Link>
+      <SiteHeader currentPath="/create-event" />
 
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-white hover:text-princeton-orange transition-colors">
-                Accueil
-              </Link>
-              <Link href="/events" className="text-white hover:text-princeton-orange transition-colors">
-                Événements
-              </Link>
-              <Link href="/create-event" className="text-princeton-orange font-semibold">
-                Créer un événement
-              </Link>
-              <Link href="/dashboard" className="text-white hover:text-princeton-orange transition-colors">
-                Tableau de bord
-              </Link>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-white hover:text-princeton-orange hover:bg-white/10">
-                <Link href="/login">Connexion</Link>
-              </Button>
-              <Button className="bg-sinopia hover:bg-engineering-orange text-white">
-                <Link href="/register">S'inscrire</Link>
-              </Button>
-            </div>
-          </nav>
-        </div>
-      </header>
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <ResponsiveContainer className="py-8">
         {/* Page Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-selective-yellow mb-4">Créer un événement</h1>
@@ -377,7 +346,7 @@ export default function CreateEventPage() {
             </div>
           </form>
         </div>
-      </div>
+      </ResponsiveContainer>
     </div>
   )
 }
