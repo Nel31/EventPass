@@ -26,7 +26,13 @@ export function ResponsiveLogo({ size = "medium", withText = true, className = "
 
   return (
     <Link href="/" className={cn(`flex items-center ${sizes[size].spacing}`, className)}>
-      <img src="/logo-horizontal.png" alt="EventPass" className={cn(sizes[size].container, "w-auto object-contain")} />
+      <img
+        src="/logo-horizontal.png"
+        alt="EventPass"
+        className={cn(sizes[size].container, "w-auto object-contain")}
+        loading="eager"
+        decoding="async"
+      />
     </Link>
   )
 }

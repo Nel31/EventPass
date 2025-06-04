@@ -19,11 +19,13 @@ export function MobileMenu({ isLoggedIn = false }: MobileMenuProps) {
     setOpen(false)
   }
 
+  // Toujours afficher Événements et Créer un événement
   const navItems = [
     { href: "/", label: "Accueil" },
     { href: "/events", label: "Événements" },
     { href: "/create-event", label: "Créer un événement" },
-    { href: "/dashboard", label: "Tableau de bord" },
+    // Afficher le tableau de bord seulement si connecté
+    ...(isLoggedIn ? [{ href: "/dashboard", label: "Tableau de bord" }] : []),
   ]
 
   return (
@@ -76,12 +78,12 @@ export function MobileMenu({ isLoggedIn = false }: MobileMenuProps) {
               </Link>
             ))}
 
-            {/* Section des boutons d'authentification avec gradient */}
-            <div className="pt-6 mt-6 border-t border-gradient-to-r from-transparent via-princeton-orange/30 to-transparent flex flex-col space-y-3 relative">
-              {/* Effet de fond dégradé pour la section */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-chocolate-cosmos/50 rounded-xl"></div>
+            {/* Section des boutons d'authentification - Seulement si déconnecté */}
+            {!isLoggedIn && (
+              <div className="pt-6 mt-6 border-t border-gradient-to-r from-transparent via-princeton-orange/30 to-transparent flex flex-col space-y-3 relative">
+                {/* Effet de fond dégradé pour la section */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-chocolate-cosmos/50 rounded-xl"></div>
 
-              {!isLoggedIn ? (
                 <div className="relative z-10 space-y-3">
                   <Button
                     variant="outline"
@@ -97,18 +99,8 @@ export function MobileMenu({ isLoggedIn = false }: MobileMenuProps) {
                     <Link href="/register">S'inscrire</Link>
                   </Button>
                 </div>
-              ) : (
-                <div className="relative z-10">
-                  <Button
-                    variant="outline"
-                    className="w-full border-princeton-orange/50 text-rich-black bg-white hover:bg-white/90 hover:border-princeton-orange transition-all duration-300 hover:shadow-lg hover:shadow-princeton-orange/20"
-                    onClick={handleLinkClick}
-                  >
-                    Déconnexion
-                  </Button>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </nav>
 
           {/* Effet de bordure dégradée */}

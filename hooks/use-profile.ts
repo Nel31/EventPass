@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/client"
 import { useUser } from "./use-user"
@@ -7,7 +9,7 @@ export function useProfile() {
   const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !supabase) {
       setProfile(null)
       return
     }

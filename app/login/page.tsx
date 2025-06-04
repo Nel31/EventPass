@@ -1,25 +1,37 @@
 "use client"
 
-import { Mail, Lock, Eye, EyeOff } from "lucide-react"
+import type React from "react"
+
+import { Mail, Lock, Eye, EyeOff, CheckCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
+import { FieldValidation } from "@/components/field-validation"
+import { GuestOnlyRoute } from "@/components/guest-only-route"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthActions } from "@/hooks/use-auth-actions"
 import { useUser } from "@/hooks/use-user"
+import { useToast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [focusedField, setFocusedField] = useState<string | null>(null)
+
   const { signIn, signInWithGoogle } = useAuthActions()
   const { user } = useUser()
   const router = useRouter()
+  const { toast } = useToast()
 
   useEffect(() => {
     if (user) {
@@ -29,11 +41,70 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const { error } = await signIn(email, password)
-    if (!error) {
-      router.push("/dashboard")
-    } else {
-      console.error(error.message)
+    setIsLoading(true)
+
+    try {
+      const { error } = await signIn(email, password)
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de connexion",
+          description:
+            error.message === "Invalid login credentials"
+              ? "Identifiants incorrects. Vérifiez votre email et mot de passe."
+              : "Une erreur est survenue. Veuillez réessayer.",
+        })
+      } else {
+        setIsSuccess(true)
+        toast({
+          variant: "success",
+          title: "Connexion réussie !",
+          description: "Heureux de vous revoir ! Redirection en cours...",
+        })
+        setTimeout(() => {
+          router.push("/dashboard")
+        }, 1500)
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de se connecter. Vérifiez votre connexion internet.",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      const { error } = await signInWithGoogle()
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de connexion",
+          description: "Impossible de se connecter avec Google. Veuillez réessayer.",
+        })
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue avec Google.",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !isLoading) {
+      e.preventDefault()
+      const form = e.currentTarget.closest("form")
+      if (form) {
+        form.requestSubmit()
+      }
     }
   }
 
@@ -48,22 +119,38 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md mx-auto px-4">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2">
-            <img src="/logo-main.png" alt="EventPass" className="h-10 w-10 sm:h-12 sm:w-12" />
-            <span className="text-3xl font-bold text-selective-yellow">EventPass</span>
+          <Link href="/" className="inline-flex items-center space-x-2 group">
+            <img
+              src="/logo-horizontal.png"
+              alt="EventPass"
+              className="h-8 sm:h-9 md:h-10 w-auto object-contain transition-transform group-hover:scale-110"
+              loading="eager"
+              decoding="async"
+            />
           </Link>
         </div>
 
-        <Card className="bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 transition-all duration-300 hover:bg-white/15">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-selective-yellow">Connexion</CardTitle>
-            <CardDescription className="text-orange-web/80">Connectez-vous à votre compte EventPass</CardDescription>
+            <CardTitle className="text-2xl font-bold text-selective-yellow">
+              {isSuccess ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <span>Connexion réussie !</span>
+                </div>
+              ) : (
+                "Connexion"
+              )}
+            </CardTitle>
+            <CardDescription className="text-orange-web/80">
+              {isSuccess ? "Redirection en cours..." : "Heureux de vous revoir ! Connectez-vous à votre compte"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-white">
-                  Email
+                  Email *
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-web/80 h-4 w-4" />
@@ -72,15 +159,28 @@ export default function LoginPage() {
                     type="email"
                     placeholder="votre@email.com"
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
+                    onChange={(e) => setEmail(e.target.value)}
+                    onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isLoading || isSuccess}
+                    className={cn(
+                      "pl-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 transition-all duration-200",
+                      focusedField === "email" && "ring-2 ring-princeton-orange border-princeton-orange scale-[1.02]",
+                      "focus:border-princeton-orange",
+                    )}
+                    aria-label="Adresse email"
+                    aria-describedby="email-validation"
                   />
+                </div>
+                <div id="email-validation">
+                  <FieldValidation value={email} type="email" />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-white">
-                  Mot de passe
+                  Mot de passe *
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-web/80 h-4 w-4" />
@@ -89,32 +189,73 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
+                    onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isLoading || isSuccess}
+                    className={cn(
+                      "pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 transition-all duration-200",
+                      focusedField === "password" &&
+                        "ring-2 ring-princeton-orange border-princeton-orange scale-[1.02]",
+                      "focus:border-princeton-orange",
+                    )}
+                    aria-label="Mot de passe"
+                    aria-describedby="password-validation"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-web/80 hover:text-princeton-orange"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-web/80 hover:text-princeton-orange transition-colors"
+                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
+                </div>
+                <div id="password-validation">
+                  <FieldValidation value={password} type="required" />
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" />
-                  <Label htmlFor="remember" className="text-orange-web/80 text-sm">
+                  <Checkbox
+                    id="remember"
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    disabled={isLoading || isSuccess}
+                  />
+                  <Label htmlFor="remember" className="text-orange-web/80 text-sm cursor-pointer">
                     Se souvenir de moi
                   </Label>
                 </div>
-                <Link href="/forgot-password" className="text-princeton-orange hover:text-princeton-orange text-sm">
+                <Link
+                  href="/forgot-password"
+                  className="text-princeton-orange hover:text-selective-yellow text-sm transition-colors"
+                >
                   Mot de passe oublié ?
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full bg-sinopia hover:bg-engineering-orange text-white py-3">Se connecter</Button>
+              <Button
+                type="submit"
+                disabled={isLoading || isSuccess || !email || !password}
+                className="w-full bg-sinopia hover:bg-engineering-orange text-white py-3 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Connexion en cours...</span>
+                  </div>
+                ) : isSuccess ? (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Connecté !</span>
+                  </div>
+                ) : (
+                  "Se connecter"
+                )}
+              </Button>
             </form>
 
             <div className="relative">
@@ -127,8 +268,9 @@ export default function LoginPage() {
             <div className="space-y-3">
               <Button
                 variant="outline"
-                onClick={() => signInWithGoogle()}
-                className="w-full border-princeton-orange text-rich-black bg-white hover:bg-white/90"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading || isSuccess}
+                className="w-full border-princeton-orange text-rich-black bg-white hover:bg-white/90 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
               >
                 <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
                   <path
@@ -148,37 +290,35 @@ export default function LoginPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Continuer avec Google
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full border-princeton-orange text-rich-black bg-white hover:bg-white/90"
-              >
-                <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-                Continuer avec Facebook
+                {isLoading ? "Connexion..." : "Continuer avec Google"}
               </Button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <p className="text-orange-web/80 text-sm">
                 Pas encore de compte ?{" "}
-                <Link href="/register" className="text-princeton-orange hover:text-princeton-orange font-semibold">
+                <Link
+                  href="/register"
+                  className="text-princeton-orange hover:text-selective-yellow font-semibold transition-colors"
+                >
                   Créer un compte
                 </Link>
               </p>
+              <Link href="/" className="text-orange-web/60 hover:text-princeton-orange text-xs transition-colors block">
+                ← Retour à l'accueil
+              </Link>
             </div>
           </CardContent>
         </Card>
-
-        <div className="text-center mt-8">
-          <Link href="/" className="text-orange-web/80 hover:text-princeton-orange text-sm">
-            ← Retour à l'accueil
-          </Link>
-        </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <GuestOnlyRoute>
+      <LoginPageContent />
+    </GuestOnlyRoute>
   )
 }
