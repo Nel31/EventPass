@@ -8,10 +8,34 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuthActions } from "@/hooks/use-auth-actions"
+import { useUser } from "@/hooks/use-user"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const { signIn, signInWithGoogle } = useAuthActions()
+  const { user } = useUser()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard")
+    }
+  }, [user, router])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const { error } = await signIn(email, password)
+    if (!error) {
+      router.push("/dashboard")
+    } else {
+      console.error(error.message)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rich-black via-chocolate-cosmos to-rosewood relative flex items-center justify-center">
@@ -36,7 +60,7 @@ export default function LoginPage() {
             <CardDescription className="text-orange-web/80">Connectez-vous à votre compte EventPass</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-white">
                   Email
@@ -47,6 +71,8 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="votre@email.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
                     className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
                   />
                 </div>
@@ -62,6 +88,8 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
                   />
                   <button
@@ -86,7 +114,7 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              <Button className="w-full bg-sinopia hover:bg-engineering-orange text-white py-3">Se connecter</Button>
+              <Button type="submit" className="w-full bg-sinopia hover:bg-engineering-orange text-white py-3">Se connecter</Button>
             </form>
 
             <div className="relative">
@@ -99,6 +127,7 @@ export default function LoginPage() {
             <div className="space-y-3">
               <Button
                 variant="outline"
+                onClick={() => signInWithGoogle()}
                 className="w-full border-princeton-orange text-rich-black bg-white hover:bg-white/90"
               >
                 <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">

@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { ResponsiveLogo } from "@/components/responsive-logo"
 import { MobileMenu } from "@/components/mobile-menu"
@@ -13,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import { useAuthActions } from "@/hooks/use-auth-actions"
 
 interface SiteHeaderProps {
   currentPath?: string
@@ -27,6 +30,7 @@ export function SiteHeader({
   userName = "John Doe",
   userInitials = "JD",
 }: SiteHeaderProps) {
+  const { signOut } = useAuthActions()
   return (
     <header className="relative z-10 backdrop-blur-md bg-white/5 border-b border-white/10 sticky top-0">
       <ResponsiveContainer className="py-3 sm:py-4">
@@ -95,7 +99,7 @@ export function SiteHeader({
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Déconnexion</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={signOut}>Déconnexion</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
