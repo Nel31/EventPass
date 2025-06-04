@@ -8,11 +8,37 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuthActions } from "@/hooks/use-auth-actions"
+import { useUser } from "@/hooks/use-user"
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const { signUp, signInWithGoogle } = useAuthActions()
+  const { user } = useUser()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (user) {
+      router.push("/dashboard")
+    }
+  }, [user, router])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (password !== confirmPassword) return
+    const { error } = await signUp(email, password)
+    if (!error) {
+      router.push("/dashboard")
+    } else {
+      console.error(error.message)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rich-black via-chocolate-cosmos to-rosewood relative flex items-center justify-center">
@@ -40,7 +66,7 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName" className="text-white">
@@ -83,6 +109,8 @@ export default function RegisterPage() {
                     id="email"
                     type="email"
                     placeholder="votre@email.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
                     className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
                   />
                 </div>
@@ -98,6 +126,8 @@ export default function RegisterPage() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
                   />
                   <button
@@ -120,6 +150,8 @@ export default function RegisterPage() {
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
                     className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-orange-web/80 focus:border-princeton-orange"
                   />
                   <button
@@ -155,7 +187,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <Button className="w-full bg-sinopia hover:bg-engineering-orange text-white py-3">
+              <Button type="submit" className="w-full bg-sinopia hover:bg-engineering-orange text-white py-3">
                 Créer mon compte
               </Button>
             </form>
@@ -170,6 +202,7 @@ export default function RegisterPage() {
             <div className="space-y-3">
               <Button
                 variant="outline"
+                onClick={() => signInWithGoogle()}
                 className="w-full border-princeton-orange text-rich-black bg-white hover:bg-white/90"
               >
                 <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24">
