@@ -4,7 +4,7 @@ import { ResponsiveContainer } from "@/components/responsive-container"
 import { ResponsiveGrid } from "@/components/responsive-grid"
 import { EventCard } from "@/components/event-card"
 import { Input } from "@/components/ui/input"
-import { Search, WhatsApp } from "lucide-react"
+import { Search, Apple as WhatsApp } from "lucide-react"
 import Link from "next/link"
 
 const featuredEvents = [
