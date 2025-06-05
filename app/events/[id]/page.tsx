@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { SiteHeader } from "@/components/site-header"
 import Link from "next/link"
 
 // Mock data for the event
@@ -29,38 +30,15 @@ const event = {
   date: "15 Mars 2024",
   time: "20:00",
   endTime: "04:00",
-  location: "Palais des Sports, Paris",
-  fullAddress: "8 Boulevard de Bercy, 75012 Paris",
-  price: "45€",
+  location: "Palais des Sports, Cotonou",
+  fullAddress: "8 Boulevard de Bercy, Cotonou, Bénin",
+  price: "10000 FCFA",
   category: "Musique",
   rating: 4.8,
   participants: 1250,
   maxParticipants: 2000,
-  organizer: "ElectroEvents Paris",
+  organizer: "ElectroEvents Bénin",
   image: "/placeholder.svg?height=400&width=800",
-  tickets: [
-    {
-      id: 1,
-      name: "Accès Standard",
-      price: "45€",
-      description: "Accès à toutes les scènes, vestiaire inclus",
-      available: 750,
-    },
-    {
-      id: 2,
-      name: "Accès VIP",
-      price: "85€",
-      description: "Accès VIP, bar privé, parking inclus",
-      available: 150,
-    },
-    {
-      id: 3,
-      name: "Accès Backstage",
-      price: "150€",
-      description: "Accès backstage, meet & greet avec les artistes",
-      available: 25,
-    },
-  ],
 }
 
 const relatedEvents = [
@@ -68,16 +46,16 @@ const relatedEvents = [
     id: 2,
     title: "Soirée Jazz & Blues",
     date: "22 Mars 2024",
-    location: "Paris",
-    price: "35€",
+    location: "Cotonou",
+    price: "8000 FCFA",
     image: "/placeholder.svg?height=150&width=200",
   },
   {
     id: 3,
     title: "Concert Rock Alternatif",
     date: "28 Mars 2024",
-    location: "Paris",
-    price: "40€",
+    location: "Cotonou",
+    price: "7000 FCFA",
     image: "/placeholder.svg?height=150&width=200",
   },
 ]
@@ -86,40 +64,7 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rich-black via-chocolate-cosmos to-rosewood relative">
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-md bg-white/5 border-b border-white/10">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <img src="/logo-main.png" alt="EventPass" className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-              <span className="text-2xl font-bold text-selective-yellow">EventPass</span>
-            </Link>
-
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-white hover:text-princeton-orange transition-colors">
-                Accueil
-              </Link>
-              <Link href="/events" className="text-princeton-orange font-semibold">
-                Événements
-              </Link>
-              <Link href="/create-event" className="text-white hover:text-princeton-orange transition-colors">
-                Créer un événement
-              </Link>
-              <Link href="/dashboard" className="text-white hover:text-princeton-orange transition-colors">
-                Tableau de bord
-              </Link>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-white hover:text-princeton-orange hover:bg-white/10">
-                <Link href="/login">Connexion</Link>
-              </Button>
-              <Button className="bg-sinopia hover:bg-engineering-orange text-white">
-                <Link href="/register">S'inscrire</Link>
-              </Button>
-            </div>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader currentPath={`/events/${event.id}`} />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Breadcrumb */}
@@ -244,30 +189,30 @@ export default function EventDetailPage() {
             {/* Ticket Selection */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 sticky top-8">
               <CardHeader>
-                <CardTitle className="text-selective-yellow text-xl">Choisir vos billets</CardTitle>
+                <CardTitle className="text-selective-yellow text-xl">Acheter des billets</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {event.tickets.map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    className="border border-white/20 rounded-lg p-4 hover:border-princeton-orange transition-colors"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="text-white font-semibold">{ticket.name}</h4>
-                      <span className="text-selective-yellow font-bold text-lg">{ticket.price}</span>
-                    </div>
-                    <p className="text-orange-web/80 text-sm mb-3">{ticket.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-orange-web/80 text-sm">{ticket.available} places restantes</span>
-                      <Button size="sm" className="bg-sinopia hover:bg-engineering-orange text-white">
-                        Sélectionner
-                      </Button>
-                    </div>
+                
+                <div className="border border-white/20 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="text-white font-semibold text-2xl">{event.price}</h4>
                   </div>
-                ))}
+                  <p className="text-orange-web/80 text-sm mb-6">
+                    Places restantes : {event.maxParticipants - event.participants}
+                  </p>
+                  <Button className="w-full bg-sinopia hover:bg-engineering-orange text-white text-lg py-3">
+                    <Link href={`/checkout/${event.id}`}>Acheter avec Mobile Money</Link>
+                  </Button>
+                </div>
 
-                <Button className="w-full bg-sinopia hover:bg-engineering-orange text-white text-lg py-3">
-                  <Link href={`/checkout/${event.id}`}>Acheter maintenant</Link>
+                <Button
+                  variant="outline"
+                  className="w-full border-princeton-orange text-rich-black bg-white hover:bg-princeton-orange hover:text-white"
+                  asChild
+                >
+                  <Link href={`https://wa.me/?text=${encodeURIComponent(`Découvrez ${event.title} sur EventPass!`)}`}>
+                    Partager sur WhatsApp
+                  </Link>
                 </Button>
               </CardContent>
             </Card>

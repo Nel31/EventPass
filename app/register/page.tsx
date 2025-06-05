@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
+import { ResponsiveLogo } from "@/components/responsive-logo"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -26,9 +27,8 @@ export default function RegisterPage() {
       <div className="relative z-10 w-full max-w-md mx-auto px-4">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-2">
-            <img src="/logo-main.png" alt="EventPass" className="h-10 w-10 sm:h-12 sm:w-12" />
-            <span className="text-3xl font-bold text-selective-yellow">EventPass</span>
+          <Link href="/" className="inline-flex items-center justify-center">
+            <ResponsiveLogo size="large" />
           </Link>
         </div>
 
